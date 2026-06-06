@@ -64,97 +64,53 @@ static void MX_USART2_UART_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-static void Calculate_Slopes(void)
-{
-    for (uint16_t i = 1; i < SWEEP_POINT_COUNT - 1; i++)
-    {
-        sweep_slope_data[i] = (sweep_vpp_data[i + 1] - sweep_vpp_data[i - 1]) / 2.0f;
-    }
-    sweep_slope_data[0] = sweep_vpp_data[1] - sweep_vpp_data[0];
-    sweep_slope_data[SWEEP_POINT_COUNT - 1] = sweep_vpp_data[SWEEP_POINT_COUNT - 1] - sweep_vpp_data[SWEEP_POINT_COUNT - 2];
-}
-
 static void Analyze_FilterType(void)
 {
-    Calculate_Slopes();
+    char buf[32];
 
-    uint16_t pos_slope_count = 0;
-    uint16_t neg_slope_count = 0;
-    uint16_t slope_sign_changes = 0;
-    uint8_t last_sign = 0;
-
+    float first_avg = 0, mid_avg = 0, last_avg = 0;
     float max_vpp = 0;
-    float min_vpp = 999999.0f;
-    uint16_t max_index = 0;
-    uint16_t min_index = 0;
-
-    for (uint16_t i = 0; i < SWEEP_POINT_COUNT; i++)
-    {
-        if (sweep_vpp_data[i] > max_vpp)
-        {
-            max_vpp = sweep_vpp_data[i];
-            max_index = i;
-        }
-        if (sweep_vpp_data[i] < min_vpp)
-        {
-            min_vpp = sweep_vpp_data[i];
-            min_index = i;
-        }
-
-        if (sweep_slope_data[i] > 0.001f)
-        {
-            pos_slope_count++;
-            if (last_sign == 2) slope_sign_changes++;
-            last_sign = 1;
-        }
-        else if (sweep_slope_data[i] < -0.001f)
-        {
-            neg_slope_count++;
-            if (last_sign == 1) slope_sign_changes++;
-            last_sign = 2;
-        }
-    }
-
-    float first_third_avg = 0, last_third_avg = 0;
     uint16_t third = SWEEP_POINT_COUNT / 3;
 
     for (uint16_t i = 0; i < third; i++)
-    {
-        first_third_avg += sweep_vpp_data[i];
-    }
-    first_third_avg /= third;
+        first_avg += sweep_vpp_data[i];
+    first_avg /= third;
 
-    for (uint16_t i = SWEEP_POINT_COUNT - third; i < SWEEP_POINT_COUNT; i++)
-    {
-        last_third_avg += sweep_vpp_data[i];
-    }
-    last_third_avg /= third;
+    for (uint16_t i = third; i < third * 2; i++)
+        mid_avg += sweep_vpp_data[i];
+    mid_avg /= third;
 
-    char buf[32];
-    uint8_t filter_type = 0;
+    for (uint16_t i = third * 2; i < SWEEP_POINT_COUNT; i++)
+        last_avg += sweep_vpp_data[i];
+    last_avg /= third;
 
-    if (first_third_avg > last_third_avg * 1.5f && max_index < SWEEP_POINT_COUNT / 3)
-    {
-        filter_type = 1;
-    }
-    else if (last_third_avg > first_third_avg * 1.5f && max_index > SWEEP_POINT_COUNT * 2 / 3)
-    {
-        filter_type = 2;
-    }
-    else if (max_index > SWEEP_POINT_COUNT / 4 && max_index < SWEEP_POINT_COUNT * 3 / 4)
-    {
-        if (first_third_avg > min_vpp * 1.3f && last_third_avg > min_vpp * 1.3f)
-        {
-            filter_type = 3;
-        }
-    }
-    else if (min_index > SWEEP_POINT_COUNT / 4 && min_index < SWEEP_POINT_COUNT * 3 / 4)
-    {
-        if (first_third_avg < max_vpp * 0.7f && last_third_avg < max_vpp * 0.7f)
-        {
-            filter_type = 4;
-        }
-    }
+    for (uint16_t i = 0; i < SWEEP_POINT_COUNT; i++)
+        if (sweep_vpp_data[i] > max_vpp) max_vpp = sweep_vpp_data[i];
+
+    float edge_avg = (first_avg + last_avg) / 2.0f + 0.0001f;
+    float ratio = first_avg / (last_avg + 0.0001f);
+    float center_ratio = mid_avg / (edge_avg + 0.0001f);
+
+    float lp_score = 0, hp_score = 0, bp_score = 0, bs_score = 0;
+
+    if (ratio >= 1.0f)
+        lp_score += (ratio - 1.0f) * 2.0f;
+    else
+        hp_score += (1.0f - ratio) * 2.0f;
+
+    if (center_ratio >= 1.0f)
+        bp_score += (center_ratio - 1.0f) * 1.5f;
+    else
+        bs_score += (1.0f - center_ratio) * 1.5f;
+
+    float first_ratio = first_avg / (max_vpp + 0.0001f);
+    float last_ratio = last_avg / (max_vpp + 0.0001f);
+    float mid_ratio = mid_avg / (max_vpp + 0.0001f);
+
+    lp_score += first_ratio * 0.5f;
+    hp_score += last_ratio * 0.5f;
+    bp_score += mid_ratio * 0.5f;
+    bs_score += (1.0f - mid_ratio) * 0.5f;
 
     sprintf(buf, "t0.bco=%u", COLOR_DEFAULT);
     usart2_send_string(buf);
@@ -179,6 +135,13 @@ static void Analyze_FilterType(void)
     usart2_send_byte(0xff);
     usart2_send_byte(0xff);
     usart2_send_byte(0xff);
+
+    float max_score = lp_score;
+    uint8_t filter_type = 1;
+
+    if (hp_score > max_score) { max_score = hp_score; filter_type = 2; }
+    if (bp_score > max_score) { max_score = bp_score; filter_type = 3; }
+    if (bs_score > max_score) { max_score = bs_score; filter_type = 4; }
 
     switch (filter_type)
     {
