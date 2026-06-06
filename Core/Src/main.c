@@ -93,34 +93,21 @@ static void Analyze_FilterType(void)
 
     uint8_t filter_type = 0;
     float last_to_mid = last_avg / (mid_avg + 0.0001f);
+    float first_vpp_mv = first_avg * 1000.0f;
 
-    if (min_index < SWEEP_POINT_COUNT / 2 && first_avg > min_vpp * 1.5f && last_avg > min_vpp * 1.5f)
+    if (first_vpp_mv > 500.0f)
     {
-        filter_type = 4;
+        if (min_index < SWEEP_POINT_COUNT / 2 && last_avg > min_vpp * 1.5f)
+            filter_type = 4;
+        else
+            filter_type = 1;
     }
-    else if (first_avg < max_vpp * 0.4f)
+    else
     {
         if (last_to_mid < 0.7f)
             filter_type = 3;
         else
             filter_type = 2;
-    }
-    else if (first_avg > max_vpp * 0.5f)
-    {
-        filter_type = 1;
-    }
-
-    if (filter_type == 0)
-    {
-        float first_to_last = last_avg / (first_avg + 0.0001f);
-        if (first_to_last > 1.3f)
-            filter_type = 2;
-        else if (first_to_last < 0.7f)
-            filter_type = 1;
-        else if (mid_avg > first_avg && mid_avg > last_avg)
-            filter_type = 3;
-        else
-            filter_type = 4;
     }
 
     sprintf(buf, "t0.bco=%u", COLOR_DEFAULT);
@@ -192,13 +179,13 @@ static void Sweep_Frequency(void)
     while (point_index < SWEEP_POINT_COUNT)
     {
         AD9910_FreWrite(freq_point);
-        HAL_Delay(20);
+        HAL_Delay(10);
 
         float vpp_sum = 0;
         for (uint8_t i = 0; i < 3; i++)
         {
             vpp_sum += ADC1_GetVpp_Voltage();
-            HAL_Delay(10);
+            HAL_Delay(5);
         }
         float vpp_avg = vpp_sum / 3.0f;
 
@@ -220,7 +207,7 @@ static void Sweep_Frequency(void)
         point_index++;
         freq_point += SWEEP_FREQ_STEP;
 
-        HAL_Delay(400);
+        HAL_Delay(150);
     }
 
     Analyze_FilterType();
