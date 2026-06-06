@@ -64,6 +64,155 @@ static void MX_USART2_UART_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+static void Calculate_Slopes(void)
+{
+    for (uint16_t i = 1; i < SWEEP_POINT_COUNT - 1; i++)
+    {
+        sweep_slope_data[i] = (sweep_vpp_data[i + 1] - sweep_vpp_data[i - 1]) / 2.0f;
+    }
+    sweep_slope_data[0] = sweep_vpp_data[1] - sweep_vpp_data[0];
+    sweep_slope_data[SWEEP_POINT_COUNT - 1] = sweep_vpp_data[SWEEP_POINT_COUNT - 1] - sweep_vpp_data[SWEEP_POINT_COUNT - 2];
+}
+
+static void Analyze_FilterType(void)
+{
+    Calculate_Slopes();
+
+    uint16_t pos_slope_count = 0;
+    uint16_t neg_slope_count = 0;
+    uint16_t slope_sign_changes = 0;
+    uint8_t last_sign = 0;
+
+    float max_vpp = 0;
+    float min_vpp = 999999.0f;
+    uint16_t max_index = 0;
+    uint16_t min_index = 0;
+
+    for (uint16_t i = 0; i < SWEEP_POINT_COUNT; i++)
+    {
+        if (sweep_vpp_data[i] > max_vpp)
+        {
+            max_vpp = sweep_vpp_data[i];
+            max_index = i;
+        }
+        if (sweep_vpp_data[i] < min_vpp)
+        {
+            min_vpp = sweep_vpp_data[i];
+            min_index = i;
+        }
+
+        if (sweep_slope_data[i] > 0.001f)
+        {
+            pos_slope_count++;
+            if (last_sign == 2) slope_sign_changes++;
+            last_sign = 1;
+        }
+        else if (sweep_slope_data[i] < -0.001f)
+        {
+            neg_slope_count++;
+            if (last_sign == 1) slope_sign_changes++;
+            last_sign = 2;
+        }
+    }
+
+    float first_third_avg = 0, last_third_avg = 0;
+    uint16_t third = SWEEP_POINT_COUNT / 3;
+
+    for (uint16_t i = 0; i < third; i++)
+    {
+        first_third_avg += sweep_vpp_data[i];
+    }
+    first_third_avg /= third;
+
+    for (uint16_t i = SWEEP_POINT_COUNT - third; i < SWEEP_POINT_COUNT; i++)
+    {
+        last_third_avg += sweep_vpp_data[i];
+    }
+    last_third_avg /= third;
+
+    char buf[32];
+    uint8_t filter_type = 0;
+
+    if (first_third_avg > last_third_avg * 1.5f && max_index < SWEEP_POINT_COUNT / 3)
+    {
+        filter_type = 1;
+    }
+    else if (last_third_avg > first_third_avg * 1.5f && max_index > SWEEP_POINT_COUNT * 2 / 3)
+    {
+        filter_type = 2;
+    }
+    else if (max_index > SWEEP_POINT_COUNT / 4 && max_index < SWEEP_POINT_COUNT * 3 / 4)
+    {
+        if (first_third_avg > min_vpp * 1.3f && last_third_avg > min_vpp * 1.3f)
+        {
+            filter_type = 3;
+        }
+    }
+    else if (min_index > SWEEP_POINT_COUNT / 4 && min_index < SWEEP_POINT_COUNT * 3 / 4)
+    {
+        if (first_third_avg < max_vpp * 0.7f && last_third_avg < max_vpp * 0.7f)
+        {
+            filter_type = 4;
+        }
+    }
+
+    sprintf(buf, "t0.bco=%u", COLOR_DEFAULT);
+    usart2_send_string(buf);
+    usart2_send_byte(0xff);
+    usart2_send_byte(0xff);
+    usart2_send_byte(0xff);
+
+    sprintf(buf, "t2.bco=%u", COLOR_DEFAULT);
+    usart2_send_string(buf);
+    usart2_send_byte(0xff);
+    usart2_send_byte(0xff);
+    usart2_send_byte(0xff);
+
+    sprintf(buf, "t3.bco=%u", COLOR_DEFAULT);
+    usart2_send_string(buf);
+    usart2_send_byte(0xff);
+    usart2_send_byte(0xff);
+    usart2_send_byte(0xff);
+
+    sprintf(buf, "t4.bco=%u", COLOR_DEFAULT);
+    usart2_send_string(buf);
+    usart2_send_byte(0xff);
+    usart2_send_byte(0xff);
+    usart2_send_byte(0xff);
+
+    switch (filter_type)
+    {
+        case 1:
+            sprintf(buf, "t4.bco=%u", COLOR_YELLOW);
+            usart2_send_string(buf);
+            usart2_send_byte(0xff);
+            usart2_send_byte(0xff);
+            usart2_send_byte(0xff);
+            break;
+        case 2:
+            sprintf(buf, "t3.bco=%u", COLOR_YELLOW);
+            usart2_send_string(buf);
+            usart2_send_byte(0xff);
+            usart2_send_byte(0xff);
+            usart2_send_byte(0xff);
+            break;
+        case 3:
+            sprintf(buf, "t0.bco=%u", COLOR_YELLOW);
+            usart2_send_string(buf);
+            usart2_send_byte(0xff);
+            usart2_send_byte(0xff);
+            usart2_send_byte(0xff);
+            break;
+        case 4:
+            sprintf(buf, "t2.bco=%u", COLOR_YELLOW);
+            usart2_send_string(buf);
+            usart2_send_byte(0xff);
+            usart2_send_byte(0xff);
+            usart2_send_byte(0xff);
+            break;
+    }
+}
+
 static void Sweep_Frequency(void)
 {
     sweep_running = 1;
@@ -81,7 +230,7 @@ static void Sweep_Frequency(void)
         float vpp_sum = 0;
         for (uint8_t i = 0; i < 3; i++)
         {
-            vpp_sum += ADC1_GetVpp_FFT();
+            vpp_sum += ADC1_GetVpp_Voltage();
             HAL_Delay(10);
         }
         float vpp_avg = vpp_sum / 3.0f;
@@ -107,11 +256,7 @@ static void Sweep_Frequency(void)
         HAL_Delay(400);
     }
 
-    usart2_send_string("t0.txt=\"Sweep Done\"");
-    usart2_send_byte(0xff);
-    usart2_send_byte(0xff);
-    usart2_send_byte(0xff);
-
+    Analyze_FilterType();
     sweep_running = 0;
 }
 /* USER CODE END 0 */
@@ -194,13 +339,13 @@ int main(void)
       static float vpp_sum = 0;
       static uint8_t measure_count = 0;
       
-      vpp_sum += ADC1_GetVpp_FFT();
+      vpp_sum += ADC1_GetVpp_Voltage();
       measure_count++;
       
       if (measure_count >= 5)
       {
         float vpp_avg = vpp_sum / 5;
-        uint32_t vpp_mv = (uint32_t)(vpp_avg * 1000.0f) + 100;
+        uint32_t vpp_mv = (uint32_t)(vpp_avg * 1000.0f);
         
         char buf[32];
         sprintf(buf, "n5.val=%lu", vpp_mv);

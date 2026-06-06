@@ -18,6 +18,9 @@
 #define FRAME_SPLIT   0xA2
 #define FRAME_CMD     0xCC
 
+#define COLOR_YELLOW  65504
+#define COLOR_DEFAULT 65535
+
 extern uint8_t  USART2_RX_BUF[USART2_REC_LEN];
 extern uint16_t USART2_RX_STA;
 extern uint32_t freq;
@@ -25,6 +28,7 @@ extern uint32_t vpp;
 extern volatile uint8_t g_init_done;
 
 extern float sweep_vpp_data[SWEEP_POINT_COUNT];
+extern float sweep_slope_data[SWEEP_POINT_COUNT];
 extern volatile uint8_t sweep_start_flag;
 extern volatile uint8_t sweep_running;
 

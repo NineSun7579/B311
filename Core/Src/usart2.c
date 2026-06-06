@@ -11,6 +11,7 @@ uint32_t freq;
 uint32_t vpp;
 
 float sweep_vpp_data[SWEEP_POINT_COUNT];
+float sweep_slope_data[SWEEP_POINT_COUNT];
 volatile uint8_t sweep_start_flag = 0;
 volatile uint8_t sweep_running = 0;
 

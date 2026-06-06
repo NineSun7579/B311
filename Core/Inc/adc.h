@@ -11,6 +11,7 @@
 extern ADC_HandleTypeDef hadc1;
 
 uint16_t ADC1_GetVpp(void);
+float ADC1_GetVpp_Voltage(void);
 float ADC1_GetVpp_FFT(void);
 float ADC1_GetDCVoltage(void);
 

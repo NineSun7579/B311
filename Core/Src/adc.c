@@ -40,6 +40,39 @@ uint16_t ADC1_GetVpp(void)
     return adc_max - adc_min;
 }
 
+float ADC1_GetVpp_Voltage(void)
+{
+    uint16_t i;
+    uint16_t adc_max = 0;
+    uint16_t adc_min = 65535;
+    uint32_t adc_sum = 0;
+
+    HAL_ADC_Start(&hadc1);
+
+    for (i = 0; i < ADC_BUF_SIZE; i++)
+    {
+        if (HAL_ADC_PollForConversion(&hadc1, ADC_TIMEOUT_MS) != HAL_OK)
+        {
+            HAL_ADC_Stop(&hadc1);
+            return 0.0f;
+        }
+        adc_buf[i] = (uint16_t)HAL_ADC_GetValue(&hadc1);
+    }
+
+    HAL_ADC_Stop(&hadc1);
+
+    for (i = 0; i < ADC_BUF_SIZE; i++)
+    {
+        if (adc_buf[i] > adc_max) adc_max = adc_buf[i];
+        if (adc_buf[i] < adc_min) adc_min = adc_buf[i];
+        adc_sum += adc_buf[i];
+    }
+
+    float vpp = (float)(adc_max - adc_min) * ADC_VREF / ADC_RESOLUTION;
+
+    return vpp;
+}
+
 float ADC1_GetVpp_FFT(void)
 {
     uint16_t i;
