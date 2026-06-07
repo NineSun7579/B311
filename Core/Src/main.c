@@ -64,6 +64,26 @@ static void MX_USART2_UART_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+#define FREQ_MIN        1000
+#define FREQ_MAX        50000
+#define FREQ_STEP       200
+
+static uint32_t Find_Nearest_TargetFreq(uint32_t measured_freq)
+{
+    if (measured_freq < FREQ_MIN) return FREQ_MIN;
+    if (measured_freq > FREQ_MAX) return FREQ_MAX;
+
+    uint32_t lower = FREQ_MIN + ((measured_freq - FREQ_MIN) / FREQ_STEP) * FREQ_STEP;
+    uint32_t upper = lower + FREQ_STEP;
+
+    if (upper > FREQ_MAX) return lower;
+
+    if ((measured_freq - lower) <= (upper - measured_freq))
+        return lower;
+    else
+        return upper;
+}
+
 static void Analyze_FilterType(void)
 {
     char buf[32];
@@ -285,31 +305,54 @@ int main(void)
         Sweep_Frequency();
     }
 
+    static uint8_t freq_track_enabled = 0;
+
+    if (replicate_start_flag)
+    {
+        replicate_start_flag = 0;
+        freq_track_enabled = 1;
+    }
+
     static uint32_t last_measure_tick = 0;
-    if (HAL_GetTick() - last_measure_tick >= 100)
+    static uint32_t current_dds_freq = 0;
+
+    if (HAL_GetTick() - last_measure_tick >= 500)
     {
       last_measure_tick = HAL_GetTick();
 
-      static float vpp_sum = 0;
-      static uint8_t measure_count = 0;
-      
-      vpp_sum += ADC1_GetVpp_Voltage();
-      measure_count++;
-      
-      if (measure_count >= 5)
+      float vpp_avg = ADC1_GetVpp_Voltage();
+      uint32_t vpp_mv = (uint32_t)(vpp_avg * 1000.0f);
+
+      char buf[32];
+      sprintf(buf, "n5.val=%lu", vpp_mv);
+      usart2_send_string(buf);
+      usart2_send_byte(0xff);
+      usart2_send_byte(0xff);
+      usart2_send_byte(0xff);
+
+      float freq = ADC1_GetFrequency();
+      uint32_t freq_hz = (uint32_t)freq;
+      sprintf(buf, "n10.val=%lu", freq_hz);
+      usart2_send_string(buf);
+      usart2_send_byte(0xff);
+      usart2_send_byte(0xff);
+      usart2_send_byte(0xff);
+
+      if (freq_track_enabled && freq_hz >= FREQ_MIN && freq_hz <= FREQ_MAX)
       {
-        float vpp_avg = vpp_sum / 5;
-        uint32_t vpp_mv = (uint32_t)(vpp_avg * 1000.0f);
-        
-        char buf[32];
-        sprintf(buf, "n5.val=%lu", vpp_mv);
-        usart2_send_string(buf);
-        usart2_send_byte(0xff);
-        usart2_send_byte(0xff);
-        usart2_send_byte(0xff);
-        
-        vpp_sum = 0;
-        measure_count = 0;
+        uint32_t target_freq = Find_Nearest_TargetFreq(freq_hz);
+        if (target_freq != current_dds_freq)
+        {
+          uint16_t freq_index = (target_freq - FREQ_MIN) / FREQ_STEP;
+          uint16_t target_vpp = (uint16_t)(sweep_vpp_data[freq_index] * 1000.0f);
+          uint16_t amp_word = (uint16_t)((uint32_t)target_vpp * 16383 / 800);
+          if (amp_word > 16383) amp_word = 16383;
+          HAL_Delay(100);
+          AD9910_FreWrite(target_freq);
+          HAL_Delay(100);
+          AD9910_AmpWrite(amp_word);
+          current_dds_freq = target_freq;
+        }
       }
     }
   }

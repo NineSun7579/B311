@@ -1,7 +1,7 @@
 Dependencies for Project 'H72025G', Target 'H72025G': (DO NOT MODIFY !)
 CompilerVersion: 5060528::V5.06 update 5 (build 528)::ARMCC
 F (startup_stm32h750xx.s)(0x6A22D560)(--cpu Cortex-M7.fp.dp -g --apcs=interwork -I.\RTE\_H72025G-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\6.1.0\CMSIS\Core\Include--pd "__UVISION_VERSION SETA 540" --pd "STM32H750xx SETA 1" --pd "_RTE_ SETA 1"--list startup_stm32h750xx.lst --xref -o h72025g\startup_stm32h750xx.o --depend h72025g\startup_stm32h750xx.d)
-F (../Core/Src/main.c)(0x6A24067F)(--c99 --gnu -c --cpu Cortex-M7.fp.dp -g -O3 --apcs=interwork --split_sections -I ../Core/Inc -I ../Drivers/STM32H7xx_HAL_Driver/Inc -I ../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32H7xx/Include -I ../Drivers/CMSIS/Include -I ../Drivers/CMSIS/DSP/Include -I ..\..\H72025G-I.\RTE\_H72025G-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\6.1.0\CMSIS\Core\Include-D__UVISION_VERSION="540" -DSTM32H750xx -D_RTE_ -DUSE_PWR_LDO_SUPPLY -DUSE_HAL_DRIVER -DSTM32H750xx -DARM_MATH_CM7-o h72025g\main.o --omf_browse h72025g\main.crf --depend h72025g\main.d)
+F (../Core/Src/main.c)(0x6A2527AA)(--c99 --gnu -c --cpu Cortex-M7.fp.dp -g -O3 --apcs=interwork --split_sections -I ../Core/Inc -I ../Drivers/STM32H7xx_HAL_Driver/Inc -I ../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32H7xx/Include -I ../Drivers/CMSIS/Include -I ../Drivers/CMSIS/DSP/Include -I ..\..\H72025G-I.\RTE\_H72025G-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\6.1.0\CMSIS\Core\Include-D__UVISION_VERSION="540" -DSTM32H750xx -D_RTE_ -DUSE_PWR_LDO_SUPPLY -DUSE_HAL_DRIVER -DSTM32H750xx -DARM_MATH_CM7-o h72025g\main.o --omf_browse h72025g\main.crf --depend h72025g\main.d)
 I (../Core/Inc/main.h)(0x6A22D3BB)
 I (../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal.h)(0x6A22D385)
 I (../Core/Inc/stm32h7xx_hal_conf.h)(0x6A22D55E)
@@ -41,8 +41,8 @@ I (../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_pwr_ex.h)(0x6A22D385)
 I (../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart.h)(0x6A22D385)
 I (../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart_ex.h)(0x6A22D385)
 I (..\..\H72025G\AD9910.h)(0x6A22D6A6)
-I (../Core/Inc/usart2.h)(0x6A23F79B)
-I (../Core/Inc/adc.h)(0x6A23F5AB)
+I (../Core/Inc/usart2.h)(0x6A2524F3)
+I (../Core/Inc/adc.h)(0x6A252285)
 I (../Drivers/CMSIS/DSP/Include/arm_math.h)(0x6A22D384)
 I (../Drivers/CMSIS/DSP/Include/arm_math_types.h)(0x6A22D384)
 I (C:\Keil_v5\ARM\ARMCC\include\string.h)(0x588B8344)
@@ -107,7 +107,7 @@ I (../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_pwr_ex.h)(0x6A22D385)
 I (../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart.h)(0x6A22D385)
 I (../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart_ex.h)(0x6A22D385)
 I (../Core/Inc/stm32h7xx_it.h)(0x6A22D3BA)
-I (../Core/Inc/usart2.h)(0x6A23F79B)
+I (../Core/Inc/usart2.h)(0x6A2524F3)
 F (../Core/Src/stm32h7xx_hal_msp.c)(0x6A22DE60)(--c99 --gnu -c --cpu Cortex-M7.fp.dp -g -O3 --apcs=interwork --split_sections -I ../Core/Inc -I ../Drivers/STM32H7xx_HAL_Driver/Inc -I ../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32H7xx/Include -I ../Drivers/CMSIS/Include -I ../Drivers/CMSIS/DSP/Include -I ..\..\H72025G-I.\RTE\_H72025G-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\6.1.0\CMSIS\Core\Include-D__UVISION_VERSION="540" -DSTM32H750xx -D_RTE_ -DUSE_PWR_LDO_SUPPLY -DUSE_HAL_DRIVER -DSTM32H750xx -DARM_MATH_CM7-o h72025g\stm32h7xx_hal_msp.o --omf_browse h72025g\stm32h7xx_hal_msp.crf --depend h72025g\stm32h7xx_hal_msp.d)
 I (../Core/Inc/main.h)(0x6A22D3BB)
 I (../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal.h)(0x6A22D385)
@@ -147,8 +147,8 @@ I (../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_pwr.h)(0x6A22D385)
 I (../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_pwr_ex.h)(0x6A22D385)
 I (../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart.h)(0x6A22D385)
 I (../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart_ex.h)(0x6A22D385)
-F (../Core/Src/usart2.c)(0x6A23F7A1)(--c99 --gnu -c --cpu Cortex-M7.fp.dp -g -O3 --apcs=interwork --split_sections -I ../Core/Inc -I ../Drivers/STM32H7xx_HAL_Driver/Inc -I ../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32H7xx/Include -I ../Drivers/CMSIS/Include -I ../Drivers/CMSIS/DSP/Include -I ..\..\H72025G-I.\RTE\_H72025G-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\6.1.0\CMSIS\Core\Include-D__UVISION_VERSION="540" -DSTM32H750xx -D_RTE_ -DUSE_PWR_LDO_SUPPLY -DUSE_HAL_DRIVER -DSTM32H750xx -DARM_MATH_CM7-o h72025g\usart2.o --omf_browse h72025g\usart2.crf --depend h72025g\usart2.d)
-I (../Core/Inc/usart2.h)(0x6A23F79B)
+F (../Core/Src/usart2.c)(0x6A2524CA)(--c99 --gnu -c --cpu Cortex-M7.fp.dp -g -O3 --apcs=interwork --split_sections -I ../Core/Inc -I ../Drivers/STM32H7xx_HAL_Driver/Inc -I ../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32H7xx/Include -I ../Drivers/CMSIS/Include -I ../Drivers/CMSIS/DSP/Include -I ..\..\H72025G-I.\RTE\_H72025G-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\6.1.0\CMSIS\Core\Include-D__UVISION_VERSION="540" -DSTM32H750xx -D_RTE_ -DUSE_PWR_LDO_SUPPLY -DUSE_HAL_DRIVER -DSTM32H750xx -DARM_MATH_CM7-o h72025g\usart2.o --omf_browse h72025g\usart2.crf --depend h72025g\usart2.d)
+I (../Core/Inc/usart2.h)(0x6A2524F3)
 I (../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal.h)(0x6A22D385)
 I (../Core/Inc/stm32h7xx_hal_conf.h)(0x6A22D55E)
 I (../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_rcc.h)(0x6A22D385)
@@ -189,8 +189,8 @@ I (../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart_ex.h)(0x6A22D385)
 I (..\..\H72025G\AD9910.h)(0x6A22D6A6)
 I (C:\Keil_v5\ARM\ARMCC\include\string.h)(0x588B8344)
 I (C:\Keil_v5\ARM\ARMCC\include\stdio.h)(0x588B8344)
-F (../Core/Src/adc.c)(0x6A23F59F)(--c99 --gnu -c --cpu Cortex-M7.fp.dp -g -O3 --apcs=interwork --split_sections -I ../Core/Inc -I ../Drivers/STM32H7xx_HAL_Driver/Inc -I ../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32H7xx/Include -I ../Drivers/CMSIS/Include -I ../Drivers/CMSIS/DSP/Include -I ..\..\H72025G-I.\RTE\_H72025G-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\6.1.0\CMSIS\Core\Include-D__UVISION_VERSION="540" -DSTM32H750xx -D_RTE_ -DUSE_PWR_LDO_SUPPLY -DUSE_HAL_DRIVER -DSTM32H750xx -DARM_MATH_CM7-o h72025g\adc.o --omf_browse h72025g\adc.crf --depend h72025g\adc.d)
-I (../Core/Inc/adc.h)(0x6A23F5AB)
+F (../Core/Src/adc.c)(0x6A252273)(--c99 --gnu -c --cpu Cortex-M7.fp.dp -g -O3 --apcs=interwork --split_sections -I ../Core/Inc -I ../Drivers/STM32H7xx_HAL_Driver/Inc -I ../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32H7xx/Include -I ../Drivers/CMSIS/Include -I ../Drivers/CMSIS/DSP/Include -I ..\..\H72025G-I.\RTE\_H72025G-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\6.1.0\CMSIS\Core\Include-D__UVISION_VERSION="540" -DSTM32H750xx -D_RTE_ -DUSE_PWR_LDO_SUPPLY -DUSE_HAL_DRIVER -DSTM32H750xx -DARM_MATH_CM7-o h72025g\adc.o --omf_browse h72025g\adc.crf --depend h72025g\adc.d)
+I (../Core/Inc/adc.h)(0x6A252285)
 I (../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal.h)(0x6A22D385)
 I (../Core/Inc/stm32h7xx_hal_conf.h)(0x6A22D55E)
 I (../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_rcc.h)(0x6A22D385)

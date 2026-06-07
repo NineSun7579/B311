@@ -78,6 +78,7 @@ targets:
         - USE_HAL_DRIVER
         - STM32H750xx
       incList:
+        - .
         - ../Core/Inc
         - ../Drivers/STM32H7xx_HAL_Driver/Inc
         - ../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy

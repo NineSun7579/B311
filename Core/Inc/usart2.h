@@ -17,6 +17,7 @@
 #define FRAME_TAIL2   0xAA
 #define FRAME_SPLIT   0xA2
 #define FRAME_CMD     0xCC
+#define FRAME_CMD_REPLICATE 0xA8
 
 #define COLOR_YELLOW  65504
 #define COLOR_DEFAULT 65535
@@ -31,6 +32,7 @@ extern float sweep_vpp_data[SWEEP_POINT_COUNT];
 extern float sweep_slope_data[SWEEP_POINT_COUNT];
 extern volatile uint8_t sweep_start_flag;
 extern volatile uint8_t sweep_running;
+extern volatile uint8_t replicate_start_flag;
 
 void usart2_send_byte(uint8_t data);
 void usart2_send_string(char *str);
