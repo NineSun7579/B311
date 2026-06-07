@@ -40,3 +40,4 @@
 ..\obj\main.o: ..\SYSTEM\delay\delay.h
 ..\obj\main.o: AD9910.h
 ..\obj\main.o: ..\SYSTEM\usart\usart3.h
+..\obj\main.o: adc.h

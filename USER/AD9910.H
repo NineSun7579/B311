@@ -23,9 +23,8 @@
 
 void AD9110_IOInit(void);
 void Init_AD9910(void);
-void AD9910_FreWrite(ulong Freq);										//??ùù
+void AD9910_FreWrite(ulong Freq);										//??ÊΩ©
 void AD9910_AmpWrite(uint16_t Amp);
-
 #endif
 
 
