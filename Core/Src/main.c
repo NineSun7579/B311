@@ -93,9 +93,9 @@ static void Analyze_FilterType(void)
 
     uint8_t filter_type = 0;
     float last_to_mid = last_avg / (mid_avg + 0.0001f);
-    float first_vpp_mv = first_avg * 1000.0f;
+    float first_point_mv = sweep_vpp_data[0] * 1000.0f;
 
-    if (first_vpp_mv > 500.0f)
+    if (first_point_mv > 500.0f)
     {
         if (min_index < SWEEP_POINT_COUNT / 2 && last_avg > min_vpp * 1.5f)
             filter_type = 4;
